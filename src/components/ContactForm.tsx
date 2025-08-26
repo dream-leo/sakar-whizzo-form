@@ -55,19 +55,44 @@ export default function ContactForm() {
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-    try {
-      console.log("Form Data:", data);
+    setSubmitMessage("");
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const response = await fetch("/api/lead", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit lead");
+      }
 
       setSubmitMessage(
-        "Thank you for your interest! We will contact you within 24 hours."
+        result.message ||
+          "Thank you for your interest! We will contact you within 24 hours."
       );
       setSubmitType("success");
+
+      // Optional: Track the lead ID for follow-up
+      if (result.leadId) {
+        console.log("Lead submitted with ID:", result.leadId);
+        // You could store this in localStorage or send to analytics
+        localStorage.setItem("lastLeadId", result.leadId);
+      }
+
       reset();
     } catch (error) {
-      setSubmitMessage("Something went wrong. Please try again.");
+      console.error("Lead submission error:", error);
+      setSubmitMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
       setSubmitType("error");
     } finally {
       setIsSubmitting(false);
