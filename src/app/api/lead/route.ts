@@ -69,12 +69,13 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.LEAD_API_KEY}`, // if required
-        "User-Agent": "SakarWhizzo-LeadAPI/1.0",
+        // Authorization: `Bearer ${process.env.LEAD_API_KEY}`,
+        // "User-Agent": "SakarWhizzo-LeadAPI/1.0",
       },
       body: JSON.stringify(webhookPayload),
     });
 
+    console.log("webhookResponse: ", webhookResponse);
     if (!webhookResponse.ok) {
       const errorText = await webhookResponse.text();
       console.error("Lead webhook error:", errorText);
