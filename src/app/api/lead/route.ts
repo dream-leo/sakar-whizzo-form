@@ -1,5 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
+function formatDate(date: Date): string {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Kolkata",
+    timeZoneName: "short",
+  };
+
+  return date.toLocaleDateString("en-IN", options);
+}
+
 // Types for better type safety
 interface LeadData {
   name: string;
@@ -49,16 +64,36 @@ export async function POST(request: NextRequest) {
     }
 
     // Prepare lead data for webhook
+    // const webhookPayload = {
+    //   ...leadData,
+    //   timestamp: new Date().toISOString(),
+    //   source: "sakar_whizzo_website",
+    //   user_agent: request.headers.get("user-agent") || "unknown",
+    //   ip_address:
+    //     request.headers.get("x-forwarded-for") ||
+    //     request.headers.get("x-real-ip") ||
+    //     "unknown",
+    //   // lead_score: calculateLeadScore(leadData),
+    //   formatted_budget: formatBudget(leadData.budget),
+    // };
+
+    const currentDate = new Date();
+
     const webhookPayload = {
       ...leadData,
-      timestamp: new Date().toISOString(),
+      timestamp: formatDate(currentDate),
+      // formatted_timestamp: formatDate(currentDate),
+      readable_date: currentDate.toLocaleDateString("en-IN"),
+      readable_time: currentDate.toLocaleTimeString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        hour12: true,
+      }),
       source: "sakar_whizzo_website",
       user_agent: request.headers.get("user-agent") || "unknown",
       ip_address:
         request.headers.get("x-forwarded-for") ||
         request.headers.get("x-real-ip") ||
         "unknown",
-      // lead_score: calculateLeadScore(leadData),
       formatted_budget: formatBudget(leadData.budget),
     };
 
