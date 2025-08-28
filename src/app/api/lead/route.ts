@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
         {
           error: "Failed to process your lead. Please try again.",
           details:
-            process.env.NODE_ENV === "development" ? errorText : undefined,
+            process.env.NODE_ENV === "development" ? errorText : errorText,
         },
         { status: webhookResponse.status }
       );
